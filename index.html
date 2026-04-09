@@ -356,6 +356,45 @@
       margin-bottom:14px;
     }
 
+    .concept-wrap{
+      background:#0d1117;
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:14px 16px;
+      margin-bottom:14px;
+    }
+
+    .concept-prefix{
+      color:var(--muted);
+      font-size:.88rem;
+      margin-bottom:6px;
+    }
+
+    .concept-input{
+      width:100%;
+      background:transparent;
+      border:none;
+      outline:none;
+      color:var(--text);
+      font-size:1.1rem;
+      font-weight:600;
+      padding:0;
+    }
+
+    .concept-input::placeholder{
+      color:#3a4050;
+    }
+
+    .movement-concept{
+      font-size:.9rem;
+      font-weight:600;
+      color:var(--text);
+      margin-bottom:4px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
     .amount-prefix{
       color:var(--muted);
       font-size:.88rem;
@@ -541,6 +580,18 @@
         />
       </div>
 
+      <div class="concept-wrap">
+        <div class="concept-prefix">Concepto (opcional)</div>
+        <input
+          id="conceptInput"
+          class="concept-input"
+          type="text"
+          maxlength="60"
+          placeholder="Ej: Supermercado, Nómina…"
+          autocomplete="off"
+        />
+      </div>
+
       <div class="quick">
         <button class="chip" data-value="1">1€</button>
         <button class="chip" data-value="5">5€</button>
@@ -594,6 +645,7 @@
     const confirmBtn = document.getElementById("confirmBtn");
     const cancelBtn = document.getElementById("cancelBtn");
     const closeModal = document.getElementById("closeModal");
+    const conceptInput = document.getElementById("conceptInput");
     const chips = document.querySelectorAll(".chip");
 
     const confirmModal = document.getElementById("confirmModal");
@@ -661,6 +713,10 @@
       if (e.key === "Enter") submitAmount();
     });
 
+    conceptInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") submitAmount();
+    });
+
     chips.forEach(chip => {
       chip.addEventListener("click", () => {
         const value = Number(chip.dataset.value || 0);
@@ -673,6 +729,7 @@
     function openModal(mode){
       currentMode = mode;
       amountInput.value = "";
+      conceptInput.value = "";
       sheetTitle.textContent = mode === "expense" ? "Añadir gasto" : "Añadir dinero";
       confirmBtn.textContent = mode === "expense" ? "Descontar" : "Sumar";
       confirmBtn.classList.toggle("expense", mode === "expense");
@@ -718,6 +775,7 @@
         id: String(Date.now() + Math.random()),
         type: currentMode,
         amount: round2(amount),
+        concept: conceptInput.value.trim(),
         date: new Date().toISOString(),
         balanceAfter: state.balance
       });
@@ -798,6 +856,7 @@
               <span class="badge ${movement.type}">${typeLabel}</span>
               <span class="movement-amount ${movement.type}">${amountText}</span>
             </div>
+            ${movement.concept ? `<div class="movement-concept">${movement.concept}</div>` : ""}
             <div class="movement-meta">
               <span>${dateText}</span>
               <span>Saldo tras movimiento: ${formatCurrency(movement.balanceAfter)}</span>
